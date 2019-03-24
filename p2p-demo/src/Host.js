@@ -47,10 +47,9 @@ class Host extends Component {
     this.props.peer.on('connection', (c) => {
       console.log(c)
       this.setState({conn: c});
-
-      this.setState((state, props) => ({
-        players: state.players.push(state.conn)
-      }));
+      let players = [...this.state.players];
+      players.push(this.state.conn);
+      this.setState({ players });
       console.log("Connected to: " + this.state.conn.peer);
       //ready()
       console.log(this.state.players);
@@ -99,7 +98,15 @@ class Host extends Component {
             <div id="receiver-id-label" className="receiver-id-label">ID: </div>
             <div id="receiver-id" className="receiver-id">{this.props.peer.id}</div>
             <ol className="connected=players">Connected Players:
-              <li className="no-players player-list-item" id="no-players">{(this.state.players.length > 0) ? this.state.players : "Waiting for players to connect"}</li>
+              {
+                (this.state.players.length === 0) ?
+                <li className="no-players" id="no-players">Waiting for players to connect</li>
+                :
+                this.state.players.map((player) =>
+                  <li className="player-list-item" key={player.id.toString()}>{player.id}</li>
+                )
+              }
+
             </ol>
           </section>
           <section className="data-section">
