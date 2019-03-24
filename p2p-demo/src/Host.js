@@ -45,10 +45,12 @@ class Host extends Component {
     });
 
     this.props.peer.on('connection', (c) => {
+      console.log(c)
       this.setState({conn: c});
-      this.setState({
-        players: this.state.players.push(this.state.conn)
-      });
+
+      this.setState((state, props) => ({
+        players: state.players.push(state.conn)
+      }));
       console.log("Connected to: " + this.state.conn.peer);
       //ready()
       console.log(this.state.players);
