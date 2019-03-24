@@ -1,5 +1,11 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Info you may need
+
+3 components added to test multi-player connections to a host. 
+
+Current State: basic connection established between host and player.
+
 ## Available Scripts
 
 In the project directory, you can run:
