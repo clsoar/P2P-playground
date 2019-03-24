@@ -117,7 +117,7 @@ class Player extends Component {
                 //addMessage("<span class=\"peerMsg\">Peer: </span>" + data);
                 break;
         };
-        //addMessage("<span class=\"peerMsg\">Peer:</span> " + data);
+        this.addMessage("<span class=\"peerMsg\">Peer:</span> " + data);
         console.log("message sent");
         });
         conn.on('close', function () {
@@ -138,7 +138,35 @@ class Player extends Component {
               return results[1];
       }
 
+      signal = (sigName) => {
+         if (conn.open) {
+             conn.send(sigName);
+             console.log(sigName + " signal sent");
+             this.addMessage("Player" + sigName);
+         }
+     }
 
+     addMessage = (msg) => {
+       let now = new Date();
+       let h = now.getHours();
+       let m = addZero(now.getMinutes());
+       let s = addZero(now.getSeconds());
+
+       if (h > 12)
+           h -= 12;
+       else if (h === 0)
+           h = 12;
+
+       function addZero(t) {
+           if (t < 10)
+               t = "0" + t;
+           return t;
+       };
+
+       let message = <div class="msg-time">{+ h + ":" + m + ":" + s + " - " + msg}</div>;
+       console.log(message);
+
+     }
 
 
   render() {
