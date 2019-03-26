@@ -19,7 +19,8 @@ class Player extends Component {
       }),
       conn: null,
       players: [],
-      hostId: ''
+      hostId: '',
+      messageInput: ''
     }
 
     handleInput(event) {
@@ -168,6 +169,20 @@ class Player extends Component {
 
      }
 
+     handleMessageInput(event) {
+       this.setState({messageInput: event.target.value});
+
+     }
+
+     handleSendMessage = (evt) => {
+       if (conn.open) {
+         let msg = this.state.messageInput;
+         conn.send(msg);
+         console.log("Sent: " + msg);
+         this.addMessage(msg);
+       }
+     }
+
 
   render() {
     return (
@@ -198,8 +213,15 @@ class Player extends Component {
             <div className="game-status">Game Status: </div>
             <div className="game-progress-started hidden">In progress</div>
             <div className="game-progress-waiting">Waiting for Host</div>
-            <input className="message-input" type="text" id="sendMessageBox" placeholder="Enter a message..." />
-            <button className="send-message" id="sendButton">Send</button>
+            <input className="message-input" type="text" id="sendMessageBox"
+                    placeholder="Enter a message..."
+                    value={this.state.messageInput}
+                    onChange={(evt) => this.handleMessageInput(evt)}
+
+                     />
+            <button className="send-message" id="sendButton"
+                    onClick={(evt) => this.handleSendMessage(evt)}
+            >Send</button>
             <button className="clear-messages" id="clearMsgsButton">Clear Msgs (Local)</button>
             <button className="send-win">Send Win</button>
             <button className="send-lose">Send Lose</button>
