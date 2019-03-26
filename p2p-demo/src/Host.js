@@ -51,7 +51,7 @@ class Host extends Component {
       players.push(this.state.conn);
       this.setState({ players });
       console.log("Connected to: " + this.state.conn.peer);
-      //ready()
+      this.ready()
       console.log(this.state.players);
     });
 
@@ -78,6 +78,19 @@ class Host extends Component {
     this.state.peer.on('error', (err) => {
       console.log(err);
       alert(''+ err);
+    })
+  }
+
+  ready = () => {
+    this.state.conn.on('data', (data) => {
+      console.log("Data received: ", data);
+    })
+
+    this.state.conn.on('close', () => {
+      console.log("connection reset, awaiting connection...");
+      this.setState({conn: null});
+      //this is a PeerJS method that is not registering as available
+      //start(true);
     })
   }
 
