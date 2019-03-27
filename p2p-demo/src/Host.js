@@ -7,25 +7,21 @@ import Peer from 'peerjs';
 
 class Host extends Component {
 
-  static defaultProps = {
-    peer: new Peer(null, {
-        debug: 2
-    })
-  }
 
   state = {
     peer: new Peer(null, {
-        debug: 2
+      debug: 2
     }),
     conn: null,
-    players: []
+    players: [],
+    message: ''
   }
 
   initialize = () => {
     // Create own peer object with connection to shared PeerJS server
-  //  this.setState({
+    //  this.setState({
 
-  //  })
+    //  })
 
 
     this.state.peer.on('open', (id) => {
@@ -39,14 +35,14 @@ class Host extends Component {
       }*/
 
       //handle connection message
-      console.log("ID: " + this.props.peer.id);
-
+      console.log("ID: " + this.state.peer.id);
+      this.setState({})
 
     });
 
-    this.props.peer.on('connection', (c) => {
+    this.state.peer.on('connection', (c) => {
       console.log(c)
-      this.setState({conn: c});
+      this.setState({ conn: c });
       let players = [...this.state.players];
       players.push(this.state.conn);
       this.setState({ players });
@@ -55,29 +51,29 @@ class Host extends Component {
       console.log(this.state.players);
     });
 
-    this.props.peer.on('disconnected', () => {
+    this.state.peer.on('disconnected', () => {
       //handle connection message
       console.log("Connection lost. Please reconnect");
 
 
-    // Workaround for peer.reconnect deleting previous id
-    // modified for react, vanilla JS credit to: https://github.com/jmcker/Peer-to-Peer-Cue-System
-    /*this.setState({
-      peer.id: lastPeerId;
-    })
-    peer._lastServerId = lastPeerId;*/
+      // Workaround for peer.reconnect deleting previous id
+      // modified for react, vanilla JS credit to: https://github.com/jmcker/Peer-to-Peer-Cue-System
+      /*this.setState({
+        peer.id: lastPeerId;
+      })
+      peer._lastServerId = lastPeerId;*/
       this.state.peer.reconnect();
     });
 
     this.state.peer.on('close', () => {
-      this.setState({conn: null});
+      this.setState({ conn: null });
       //handle connection message
       console.log('Connection destroyed');
     });
 
     this.state.peer.on('error', (err) => {
       console.log(err);
-      alert(''+ err);
+      alert('' + err);
     })
   }
 
@@ -88,7 +84,7 @@ class Host extends Component {
 
     this.state.conn.on('close', () => {
       console.log("connection reset, awaiting connection...");
-      this.setState({conn: null});
+      this.setState({ conn: null });
       //this is a PeerJS method that is not registering as available
       //start(true);
     })
@@ -97,6 +93,22 @@ class Host extends Component {
   componentDidMount() {
 
     this.initialize();
+  }
+
+  sendMessage = (message) => {
+    this.state.players.forEach(conn => {
+      conn.send(message);
+    })
+  }
+
+  handleInputChange = (event) => {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
   }
 
   render() {
@@ -109,15 +121,15 @@ class Host extends Component {
           <section className="connection-info">
             <div className="id-instructions">Use this ID for players to connect to host.</div>
             <div id="receiver-id-label" className="receiver-id-label">ID: </div>
-            <div id="receiver-id" className="receiver-id">{this.props.peer.id}</div>
+            <div id="receiver-id" className="receiver-id">{this.state.peer.id}</div>
             <ol className="connected=players">Connected Players:
               {
                 (this.state.players.length === 0) ?
-                <li className="no-players" id="no-players">Waiting for players to connect</li>
-                :
-                this.state.players.map((player) =>
-                  <li className="player-list-item" key={player.id.toString()}>{player.id}</li>
-                )
+                  <li className="no-players" id="no-players">Waiting for players to connect</li>
+                  :
+                  this.state.players.map((player) =>
+                    <li className="player-list-item" key={player.id.toString()}>{player.id}</li>
+                  )
               }
 
             </ol>
@@ -126,8 +138,11 @@ class Host extends Component {
             <button className="begin-game">
               Begin Game
             </button>
-            <input className="message-input" type="text" id="sendMessageBox" placeholder="Enter a message..." />
-            <button className="send-message" id="sendButton">Send</button>
+            <input className="message-input" name='message' type="text" id="sendMessageBox" placeholder="Enter a message..." onChange={this.handleInputChange} />
+            <button className="send-message" id="sendButton"
+              onClick={() => {
+                this.sendMessage(this.state.message)
+              }}>Send</button>
             <button className="clear-messages" id="clearMsgsButton">Clear Msgs (Local)</button>
             <button className="show-score">Show Scores</button>
           </section>
